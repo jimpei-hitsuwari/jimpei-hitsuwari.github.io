@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://hitsuwari-jimpei.com/sitemap.xml
