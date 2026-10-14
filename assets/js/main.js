@@ -42,7 +42,8 @@
     });
   }
 
-  /* 3. Category filter (outreach, media): buttons with data-filter, items with data-cat */
+  /* 3. Category filter (outreach, media, voicy): buttons with data-filter, items with data-cat.
+        data-cat may hold several categories separated by spaces. */
   document.querySelectorAll('[data-filter-group]').forEach(function (group) {
     var target = document.getElementById(group.dataset.filterGroup);
     if (!target) return;
@@ -52,12 +53,14 @@
         var cat = b.dataset.filter;
         buttons.forEach(function (x) { x.setAttribute('aria-pressed', String(x === b)); });
         target.querySelectorAll('[data-cat]').forEach(function (item) {
-          item.hidden = !(cat === 'all' || item.dataset.cat === cat);
+          item.hidden = !(cat === 'all' || item.dataset.cat.split(' ').indexOf(cat) !== -1);
         });
         /* hide a year group when none of its items are visible */
         target.querySelectorAll('.year-group').forEach(function (g) {
           g.hidden = !g.querySelector('[data-cat]:not([hidden])');
         });
+        /* buttons with an id (voicy) keep the choice in the URL, e.g. voicy/#art-music */
+        if (b.id && history.replaceState) history.replaceState(null, '', '#' + b.id);
       });
     });
     group.hidden = false;
@@ -91,7 +94,17 @@
       activate(startPanel.id);
       if (location.hash && location.hash !== '#' + startPanel.id) {
         var el = document.getElementById(location.hash.slice(1));
-        if (el) setTimeout(function () { el.scrollIntoView({ block: 'start', behavior: 'instant' }); }, 0);
+        if (el && el.hasAttribute('data-filter')) {
+          el.click();
+          /* after the browser's own jump to the button, put the section start just under the tabs */
+          window.addEventListener('load', function () {
+            setTimeout(function () {
+              /* where the bottom of the tabs will be once they stick under the header */
+              var offset = (parseFloat(getComputedStyle(tabBar).top) || 0) + tabBar.offsetHeight + 24;
+              window.scrollTo(0, window.pageYOffset + startPanel.getBoundingClientRect().top - offset);
+            }, 0);
+          });
+        } else if (el) setTimeout(function () { el.scrollIntoView({ block: 'start', behavior: 'instant' }); }, 0);
       }
     }
     tabLinks.forEach(function (a) {
@@ -110,6 +123,8 @@
     window.addEventListener('hashchange', function () {
       var p = panelFor(location.hash);
       if (p) activate(p.id);
+      var f = p && document.getElementById(location.hash.slice(1));
+      if (f && f.hasAttribute('data-filter')) f.click();
     });
   }
 

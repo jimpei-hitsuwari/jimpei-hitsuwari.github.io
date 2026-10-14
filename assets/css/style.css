@@ -412,3 +412,11 @@ a.inline:hover { color: var(--brown); }
   .hero-copy { justify-self: end; }
   .row { grid-template-columns: 1fr; gap: 0; }
 }
+
+/* ---------- Voicy page ---------- */
+.voicy-channel { margin-top: 24px; }
+.pub-section .filter-bar { margin-bottom: 28px; }
+.filter-list .cite a:hover { color: var(--brown); }
+@media (min-width: 641px) {
+  .pub-tabs.is-wrap ul { flex-wrap: wrap; gap: 4px 24px; }
+}
